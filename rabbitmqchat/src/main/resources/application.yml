@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: rabbitmqchat
+  rabbitmq:
+    username: ohj4312
+    password: dhguswl123@
+    virtual-host: /
+
+
+logging:
+  level:
+    org: DEBUG

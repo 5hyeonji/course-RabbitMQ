@@ -1,76 +1,90 @@
 package com.course.rabbitmqchat.config;
 
+import com.course.rabbitmqchat.receiver.Receiver;
+import com.course.rabbitmqchat.sender.Sender;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class RabbitMQConfig {
 
     @Bean
-    public TopicExchange topicRequest() {
-        return new TopicExchange("request");
-    }
+    public Receiver receiver() {return new Receiver();}
 
     @Bean
-    public TopicExchange chat() {
-        return new TopicExchange("chat");
-    }
+    public Sender sender() {return new Sender();}
 
     @Bean
-    public TopicExchange user() {
-        return new TopicExchange("user");
-    }
-    @Bean
-    public TopicExchange room() {
-        return new TopicExchange("room");
+    public Declarables bindings() {
+        TopicExchange requestTopicExchange = new TopicExchange("request");
+        TopicExchange chatTopicExchange = new TopicExchange("chat");
+        FanoutExchange userFanoutExchange = new FanoutExchange("user");
+        FanoutExchange roomFanoutExchange = new FanoutExchange("room");
+        Queue userQueue = new Queue("user");
+        Queue commandQueue = new Queue("command");
+        Queue roomQueue = new Queue("room");
+
+        return new Declarables(
+                requestTopicExchange,
+                chatTopicExchange,
+                userFanoutExchange,
+                roomFanoutExchange,
+                userQueue,
+                commandQueue,
+                roomQueue,
+                bindingChat(requestTopicExchange, chatTopicExchange),
+                bindingRoomQueue(roomFanoutExchange, roomQueue),
+                bindingUserQueue(userFanoutExchange, userQueue),
+                bindingCommand(requestTopicExchange, commandQueue),
+                bindingUser(chatTopicExchange, userFanoutExchange),
+                bindingRoom(requestTopicExchange, roomFanoutExchange)
+        );
     }
 
-    @Bean
-    public Queue commandQueue() {
-        return new Queue("command");
-    }
+        public Binding bindingChat(TopicExchange request,
+                                   Exchange chat) {
+            return BindingBuilder.bind(chat)
+                    .to(request)
+                    .with("chat.#");
+        }
 
-    @Bean
-    public Queue userQueue() {
-        return new Queue("user");
-    }
+        public Binding bindingCommand(TopicExchange requestExchange,
+                                      Queue command) {
+            return BindingBuilder.bind(command)
+                    .to(requestExchange)
+                    .with("command.#");
+        }
 
-    @Bean
-    public Queue roomQueue() {
-        return new Queue("room");
-    }
+        public Binding bindingUser(TopicExchange chat,
+                                   Exchange user) {
+            return BindingBuilder.bind(user)
+                    .to(chat)
+                    .with("*.user.#");
+        }
+
+        public Binding bindingRoom(TopicExchange request,
+                                   FanoutExchange room) {
+            return BindingBuilder.bind(room)
+                    .to(request)
+                    .with("*.room.#");
+        }
 
 
-    @Bean
-    public Binding bindingChat(TopicExchange request,
-                             Exchange chat) {
-        return BindingBuilder.bind(chat)
-                .to(request)
-                .with("chat.#");
-    }
+        public Binding bindingRoomQueue(FanoutExchange room,
+                                   Queue roomQueue) {
+            return BindingBuilder.bind(roomQueue)
+                    .to(room);
+        }
 
-    @Bean
-    public Binding bindingCommand(TopicExchange request,
-                             Queue commandQueue) {
-        return BindingBuilder.bind(commandQueue)
-                .to(request)
-                .with("command.#");
-    }
-
-    @Bean
-    public Binding bindingUser(TopicExchange user,
-                             Queue userQueue) {
-        return BindingBuilder.bind(userQueue)
-                .to(user)
-                .with("*.user.#");
-    }
-
-    @Bean
-    public Binding bindingRoom(TopicExchange room,
-                             Queue roomQueue) {
-        return BindingBuilder.bind(roomQueue)
-                .to(room)
-                .with("*.room.#");
-    }
+        public Binding bindingUserQueue(FanoutExchange user,
+                                   Queue userQueue) {
+            return BindingBuilder.bind(userQueue)
+                    .to(user);
+        }
 }
