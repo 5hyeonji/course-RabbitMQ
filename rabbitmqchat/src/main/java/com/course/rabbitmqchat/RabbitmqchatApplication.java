@@ -12,9 +12,6 @@ public class RabbitmqchatApplication {
 	public static void main(String[] args) {
 
 		SpringApplication.run(RabbitmqchatApplication.class, args);
-
-//		Sender sender = new Sender();
-//		sender.send();
 	}
 
 }

@@ -1,7 +1,6 @@
-
 spring:
   application:
-    name: rabbitmqchat
+    name: rabbitmqchat-client
   rabbitmq:
     username: ohj4312
     password: dhguswl123@
@@ -11,3 +10,6 @@ spring:
 logging:
   level:
     org: DEBUG
+
+server:
+  port: 9090
