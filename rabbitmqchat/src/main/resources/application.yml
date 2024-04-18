@@ -5,7 +5,7 @@ spring:
   rabbitmq:
     username: ohj4312
     password: dhguswl123@
-    virtual-host: /
+    virtual-host: chat
 
 
 logging:

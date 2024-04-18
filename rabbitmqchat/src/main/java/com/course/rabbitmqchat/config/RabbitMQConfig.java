@@ -27,7 +27,6 @@ public class RabbitMQConfig {
         FanoutExchange userFanoutExchange = new FanoutExchange("user");
         FanoutExchange roomFanoutExchange = new FanoutExchange("room");
         Queue userQueue = new Queue("user");
-        Queue commandQueue = new Queue("command");
         Queue roomQueue = new Queue("room");
 
         return new Declarables(
@@ -36,12 +35,10 @@ public class RabbitMQConfig {
                 userFanoutExchange,
                 roomFanoutExchange,
                 userQueue,
-                commandQueue,
                 roomQueue,
                 bindingChat(requestTopicExchange, chatTopicExchange),
                 bindingRoomQueue(roomFanoutExchange, roomQueue),
                 bindingUserQueue(userFanoutExchange, userQueue),
-                bindingCommand(requestTopicExchange, commandQueue),
                 bindingUser(chatTopicExchange, userFanoutExchange),
                 bindingRoom(requestTopicExchange, roomFanoutExchange)
         );
@@ -52,13 +49,6 @@ public class RabbitMQConfig {
             return BindingBuilder.bind(chat)
                     .to(request)
                     .with("chat.#");
-        }
-
-        public Binding bindingCommand(TopicExchange requestExchange,
-                                      Queue command) {
-            return BindingBuilder.bind(command)
-                    .to(requestExchange)
-                    .with("command.#");
         }
 
         public Binding bindingUser(TopicExchange chat,
