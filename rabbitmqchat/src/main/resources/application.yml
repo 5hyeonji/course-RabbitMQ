@@ -10,4 +10,4 @@ spring:
 
 logging:
   level:
-    org: DEBUG
+    org: info

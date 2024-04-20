@@ -16,11 +16,13 @@ public class Sender {
     @Scheduled(fixedDelay = 1000, initialDelay = 1000)
     public void send() {
         String[] keys = {"request.command.hello", "request.chat.hello", "request.chat.room.1",
-                "request.chat.user.1", "request.chat.user.me", "request.chat.room.me"};
+                "chat.user.1", "request.chat.user.me", "request.chat.room.me", "command.hello", "chat.hello"};
 
         for (String key :keys) {
             String message = "hello to " + key;
-            template.convertAndSend(key, message);
+
+
+            template.convertAndSend("request", key, message);
             System.out.println(" [x] Sent '" + message + "'");
         }
     }

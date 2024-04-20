@@ -9,7 +9,7 @@ spring:
 
 logging:
   level:
-    org: DEBUG
+    org: INFO
 
 server:
   port: 9090
