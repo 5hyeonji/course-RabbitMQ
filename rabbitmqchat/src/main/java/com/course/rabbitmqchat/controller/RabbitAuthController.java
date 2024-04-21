@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-@Profile("server")
 @RestController
 @RequestMapping("/rabbit/auth")
 public class RabbitAuthController {
@@ -48,7 +47,7 @@ public class RabbitAuthController {
 
 		System.out.println("postVhost " + objectMapper.writeValueAsString(request));
 
-		if (request.getUsername().startsWith("user") && "chat".equals(request.getVhost())) {
+		if ("chat".equals(request.getVhost())) {
 			return "allow";
 		} else {
 			return "deny";
@@ -60,26 +59,24 @@ public class RabbitAuthController {
 
 		System.out.println("postResource " + objectMapper.writeValueAsString(request));
 
-		if (request.getUsername().startsWith("user")
-				&& "chat".equals(request.getVhost())) {
+		if (request.getUsername().startsWith("user") && "chat".equals(request.getVhost())) {
 			if ("exchange".equals(request.getResource())) {
 				if ("request".equals(request.getName())
-						&& Arrays.asList("configure", "write").stream().anyMatch(request.getPermission()::equals)) {
+						&& Arrays.asList("write").stream().anyMatch(request.getPermission()::equals)) {
 					return "allow";
 				} else if ("user".equals(request.getName())
 						&& Arrays.asList("read").stream().anyMatch(request.getPermission()::equals)) {
-					return "allow";
-				} else if ("amq.default".equals(request.getName())) {
 					return "allow";
 				}
 			} else if ("queue".equals(request.getResource())) {
 				if (("user." + request.getUsername()).equals(request.getName())
 						&& Arrays.asList("configure", "write", "read").stream()
-								.anyMatch(request.getPermission()::equals)) {
+						.anyMatch(request.getPermission()::equals)) {
 					return "allow";
 				}
 			}
 		}
+
 
 		return "deny";
 	}
