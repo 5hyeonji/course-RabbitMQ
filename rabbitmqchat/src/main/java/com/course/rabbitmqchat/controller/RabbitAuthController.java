@@ -67,6 +67,8 @@ public class RabbitAuthController {
 				} else if ("user".equals(request.getName())
 						&& Arrays.asList("read").stream().anyMatch(request.getPermission()::equals)) {
 					return "allow";
+				} else if ("amq.default".equals(request.getName())) {
+					return "allow";
 				}
 			} else if ("queue".equals(request.getResource())) {
 				if (("user." + request.getUsername()).equals(request.getName())

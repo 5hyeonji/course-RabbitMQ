@@ -89,7 +89,9 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue myUserQueue() {
-        return new Queue("user." + rabbitProperties.getUsername());
+        return QueueBuilder.durable("user." + rabbitProperties.getUsername())
+                .deadLetterExchange("")
+                .deadLetterRoutingKey("dead-letter").build();
     }
 
     @Bean

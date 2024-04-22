@@ -69,18 +69,13 @@ public class RabbitMQConfig {
     }
 
 
-    @Bean
-    public Queue myUserQueue() {
-        return new Queue("user." + rabbitProperties.getUsername());
-    }
 
     @Bean
-    public Binding binding(Queue myUserQueue) {
-        return BindingBuilder.bind(myUserQueue).to(new TopicExchange("user"))
-                .with("*.user." + rabbitProperties.getUsername());
+    public Queue deadLetterQueue() {
+        return new Queue("dead-letter");
     }
 
-//    @Bean
+    //    @Bean
     public Declarables bindings() {
         TopicExchange request = new TopicExchange("request");
         TopicExchange chat = new TopicExchange("chat");
