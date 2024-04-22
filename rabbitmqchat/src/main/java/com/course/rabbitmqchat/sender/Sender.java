@@ -15,8 +15,8 @@ public class Sender {
 
     @Scheduled(fixedDelay = 1000, initialDelay = 1000)
     public void send() {
-        String[] keys = {"request.command.hello", "request.chat.hello", "request.chat.room.1",
-                "chat.user.1", "request.chat.user.me", "request.chat.room.me", "command.hello", "chat.hello"};
+        String[] keys = {"command.hello", "chat.hello", "chat.room.1",
+                "chat.user.1", "chat.user.me", "chat.room.me", "command.hello", "chat.hello"};
 
         for (String key :keys) {
             String message = "hello to " + key;
