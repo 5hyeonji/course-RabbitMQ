@@ -5,7 +5,7 @@ import org.springframework.util.StopWatch;
 
 public class Receiver {
 
-    @RabbitListener(queues = "user")
+//    @RabbitListener(queues = "user")
     public void receiveUser(String in) throws InterruptedException {
         receive(in, "user");
     }

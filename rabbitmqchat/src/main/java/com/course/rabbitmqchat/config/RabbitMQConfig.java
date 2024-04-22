@@ -5,11 +5,14 @@ import com.course.rabbitmqchat.sender.Sender;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.ContentTypeDelegatingMessageConverter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -18,12 +21,19 @@ import org.springframework.core.annotation.Order;
 @Configuration
 public class RabbitMQConfig {
 
+    @Autowired
+    private RabbitProperties rabbitProperties;
+
     @Bean
     public Receiver receiver() {return new Receiver();}
 
     @Bean
     public Sender sender() {return new Sender();}
 
+    @Bean
+    public RabbitAdmin amqpAdmin(ConnectionFactory connectionFactory) {
+        return new RabbitAdmin(connectionFactory);
+    }
 
     @Bean
     public MessageConverter messageConverter() {
@@ -32,6 +42,9 @@ public class RabbitMQConfig {
 
         MessageConverter simple = (MessageConverter) new SimpleMessageConverter();
         converter.addDelegate("text/plain", simple);
+        converter.addDelegate("application/json", new Jackson2JsonMessageConverter());
+        converter.addDelegate("application/xml", new Jackson2JsonMessageConverter());
+        converter.addDelegate("application/x-java-serialized-object", simple);
         converter.addDelegate(null, simple);
 
         return converter;
@@ -51,7 +64,6 @@ public class RabbitMQConfig {
         return factory;
     }
 
-
     @Bean
     public RabbitTemplate rabbitTemplate(
             ConnectionFactory connectionFactory,
@@ -60,7 +72,20 @@ public class RabbitMQConfig {
         template.setMessageConverter(messageConverter);
         return template;
     }
+
+
     @Bean
+    public Queue myUserQueue() {
+        return new Queue("user." + rabbitProperties.getUsername());
+    }
+
+    @Bean
+    public Binding binding(Queue myUserQueue) {
+        return BindingBuilder.bind(myUserQueue).to(new TopicExchange("user"))
+                .with("*.user." + rabbitProperties.getUsername());
+    }
+
+//    @Bean
     public Declarables bindings() {
         TopicExchange request = new TopicExchange("request");
         TopicExchange chat = new TopicExchange("chat");

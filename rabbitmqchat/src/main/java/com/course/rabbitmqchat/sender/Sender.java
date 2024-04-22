@@ -10,10 +10,10 @@ public class Sender {
     @Autowired
     private RabbitTemplate template;
 
-    @Autowired
-    private Declarables declarables;
+//    @Autowired
+//    private Declarables declarables;
 
-    @Scheduled(fixedDelay = 1000, initialDelay = 1000)
+//    @Scheduled(fixedDelay = 1000, initialDelay = 1000)
     public void send() {
         String[] keys = {"command.hello", "chat.hello", "chat.room.1",
                 "chat.user.1", "chat.user.me", "chat.room.me", "command.hello", "chat.hello"};
