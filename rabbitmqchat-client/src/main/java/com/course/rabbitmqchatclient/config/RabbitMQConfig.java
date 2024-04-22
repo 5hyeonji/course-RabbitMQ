@@ -1,10 +1,15 @@
 package com.course.rabbitmqchatclient.config;
 
+import com.course.rabbitmqchatclient.error.CustomErrorHandler;
+import com.course.rabbitmqchatclient.error.CustomFatalExceptionStrategy;
+import com.course.rabbitmqchatclient.sender.Sender;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.ConditionalRejectingErrorHandler;
+import org.springframework.amqp.rabbit.listener.FatalExceptionStrategy;
 import org.springframework.amqp.support.converter.ContentTypeDelegatingMessageConverter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -13,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ErrorHandler;
 
 @Configuration
 public class RabbitMQConfig {
@@ -48,6 +54,7 @@ public class RabbitMQConfig {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(messageConverter);
+        factory.setErrorHandler(rejectErrorHandler());
         factory.setPrefetchCount(3);
         factory.setConcurrentConsumers(3);
         factory.setMaxConcurrentConsumers(3);
@@ -65,6 +72,22 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public ErrorHandler customErrorHandler() {
+        return new CustomErrorHandler();
+    }
+
+    @Bean
+    public ErrorHandler rejectErrorHandler() {
+        return new ConditionalRejectingErrorHandler(customExceptionStrategy());
+    }
+
+    @Bean
+    public FatalExceptionStrategy customExceptionStrategy() {
+        return new CustomFatalExceptionStrategy();
+    }
+
+
+    @Bean
     public Queue myUserQueue() {
         return new Queue("user." + rabbitProperties.getUsername());
     }
@@ -75,4 +98,6 @@ public class RabbitMQConfig {
                 .with("*.user." + rabbitProperties.getUsername());
     }
 
+    @Bean
+    public Sender sender() {return new Sender();}
 }

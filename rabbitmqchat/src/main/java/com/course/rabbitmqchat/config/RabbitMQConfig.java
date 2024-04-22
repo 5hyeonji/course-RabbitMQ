@@ -1,7 +1,6 @@
 package com.course.rabbitmqchat.config;
 
 import com.course.rabbitmqchat.receiver.Receiver;
-import com.course.rabbitmqchat.sender.Sender;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -15,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.annotation.Order;
 
 @Configuration
 public class RabbitMQConfig {
@@ -27,8 +24,6 @@ public class RabbitMQConfig {
     @Bean
     public Receiver receiver() {return new Receiver();}
 
-    @Bean
-    public Sender sender() {return new Sender();}
 
     @Bean
     public RabbitAdmin amqpAdmin(ConnectionFactory connectionFactory) {

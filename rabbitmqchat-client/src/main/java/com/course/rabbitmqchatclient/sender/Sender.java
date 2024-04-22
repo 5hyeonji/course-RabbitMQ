@@ -1,4 +1,4 @@
-package com.course.rabbitmqchat.sender;
+package com.course.rabbitmqchatclient.sender;
 
 import org.springframework.amqp.core.Declarables;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -10,10 +10,8 @@ public class Sender {
     @Autowired
     private RabbitTemplate template;
 
-//    @Autowired
-//    private Declarables declarables;
 
-//    @Scheduled(fixedDelay = 1000, initialDelay = 1000)
+    @Scheduled(fixedDelay = 1000, initialDelay = 1000)
     public void send() {
         String[] keys = {"command.hello", "chat.hello", "chat.room.1",
                 "chat.user.1", "chat.user.me", "chat.room.me", "command.hello", "chat.hello"};
