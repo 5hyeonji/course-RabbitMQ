@@ -68,8 +68,6 @@ public class RabbitMQConfig {
         return template;
     }
 
-
-
     @Bean
     public Queue deadLetterQueue() {
         return new Queue("dead-letter");
@@ -79,31 +77,36 @@ public class RabbitMQConfig {
     public Declarables bindings() {
         TopicExchange request = new TopicExchange("request");
         TopicExchange chat = new TopicExchange("chat");
-        FanoutExchange user = new FanoutExchange("user");
-//        FanoutExchange room = new FanoutExchange("room");
-        Queue userQueue = new Queue("user");
-//        Queue roomQueue = new Queue("room");
+//        FanoutExchange user = new FanoutExchange("user");
+        FanoutExchange room = new FanoutExchange("room");
+//        Queue userQueue = new Queue("user");
+        Queue commandQueue = new Queue("command");
+        Queue roomQueue = new Queue("room");
 
         return new Declarables(
                 request,
                 chat,
-                user,
-//                room,
-                userQueue,
-//                roomQueue,
+//                user,
+                room,
+                commandQueue,
+//                userQueue,
+                roomQueue,
                 BindingBuilder.bind(chat)
                         .to(request)
                         .with("chat.#"),
-                BindingBuilder.bind(user)
-                        .to(chat)
-                        .with("*.user.#"),
-//                BindingBuilder.bind(room)
-//                        .to(request)
-//                        .with("*.room.#"),
-//                BindingBuilder.bind(roomQueue)
-//                        .to(room),
-                BindingBuilder.bind(userQueue)
-                        .to(user)
+//                BindingBuilder.bind(user)
+//                        .to(chat)
+//                        .with("*.user.#"),
+                BindingBuilder.bind(room)
+                        .to(request)
+                        .with("*.room.#"),
+                BindingBuilder.bind(roomQueue)
+                        .to(room),
+//                BindingBuilder.bind(userQueue)
+//                        .to(user)
+                BindingBuilder.bind(commandQueue)
+                        .to(request)
+                        .with("command.#")
         );
     }
 

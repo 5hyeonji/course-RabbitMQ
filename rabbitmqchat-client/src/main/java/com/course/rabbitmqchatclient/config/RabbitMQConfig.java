@@ -88,6 +88,15 @@ public class RabbitMQConfig {
 
 
     @Bean
+    public TopicExchange userTopicExchange() {
+        return new TopicExchange("user");
+    }
+    @Bean
+    public FanoutExchange myUserExchange() {
+        return new FanoutExchange("user." + rabbitProperties.getUsername());
+    }
+
+    @Bean
     public Queue myUserQueue() {
         return QueueBuilder.durable("user." + rabbitProperties.getUsername())
                 .deadLetterExchange("")
@@ -95,9 +104,12 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding binding(Queue myUserQueue) {
-        return BindingBuilder.bind(myUserQueue).to(new TopicExchange("user"))
-                .with("*.user." + rabbitProperties.getUsername());
+    public Binding binding(TopicExchange userTopicExchange, FanoutExchange myUserExchange) {
+        return BindingBuilder.bind(myUserExchange).to(userTopicExchange).with("*.user.#");
+    }
+    @Bean
+    public Binding bindingUserQueueToUserExchange(Queue myUserQueue, FanoutExchange myUserExchange) {
+        return BindingBuilder.bind(myUserQueue).to(myUserExchange);
     }
 
     @Bean
